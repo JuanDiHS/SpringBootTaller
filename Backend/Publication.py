@@ -32,7 +32,18 @@ class Employer_Publication(Publication):
         job_offer(job_Offer): Attributes of the job offer that will be shown in the application
         employer(Employer): Attributes of the employer that posted the job offer
         """
-        # TODO: Create method
+        print(Employer.name)
+        print(Employer.lastname)
+        print(Employer.phone_number)
+        print(Employer.company)
+        print(job_Offer.offer_Name)
+        print(job_Offer.offer_requirements)
+        print(job_Offer.minimum_age)
+        print(job_Offer.maximum_age)
+        print(job_Offer.offer_salary)
+        print(job_Offer.schedule)
+        print(job_Offer.Contract_type)
+        # TODO: Finish the method
 
 class Applicant_Publication(Publication):
     """This is a specialization of class "Publication", allows that applicant create a post 

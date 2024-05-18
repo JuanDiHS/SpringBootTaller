@@ -15,7 +15,7 @@ class User(BaseModel):
     lastname: str
     email: str
     password: str
-    grants: dict
+    role: str
 
     @staticmethod
     def login(email: str, password: str):
@@ -24,12 +24,17 @@ class User(BaseModel):
         Email (str): The email of the user
         Password (Str): The password of the user
         """
-
-        # TODO: Do return
-    def can_publish(self):
-        """This method is used to know if the user can publish a job offer or a job application
-        """
-        return self.grants.get("publish")
+        email = input("Enter your email: ")
+        password = input("Enter your password: ")
+        for email in User_List:
+            if email == User.email:
+                if password == User.password:
+                    print("Log in successfully")
+                else: 
+                    print("Wrong password")
+            else: 
+                print("Email doesn´t exist, try again")
+        # TODO Finish method
     
     def create_profile(self, user: User, role: str):
         """This method allows that an user create a profile into the application
@@ -37,12 +42,25 @@ class User(BaseModel):
         user(User): Attributes of the user like name, lastname, email and password
         Role (str): Role of the user
         """
-        # TODO: Do the method
+        User.name = input("Enter your name: ")
+        User.lastname = input("Enter your lastname: ")
+        User.email = input("Enter your email: ")
+        for email in User_List:
+            if User.email == email:
+                print("This email is already registered, try again")
+        User.password = input("Enter your password: ")
+        User.role = input("Seleccione su rol: ")
+        # TODO Finish method
+        
     def modify_profile(self, user: User):
         """This method is for change or modify some characteristics of the user
         Args:
         user(User): Attributes of the user
         """
+        User.email = input("Enter your new email: ")
+        User.password = input("Enter your new password: ")
+    # TODO Finish method
+
 
 
 
@@ -63,7 +81,11 @@ class Applicant (User):
         description(str): A simple description of applicant´s profile
         skills(str): Skills that applicant develops like degrees, certificates, etc
         """
-        # TODO: Do the method
+        Applicant.age = input("Enter your age: ")
+        if Applicant.age < 18 or age > 100:
+            print("Enter a valid age.")
+        Applicant.city = input("Enter your city of residence: ")
+        # TODO finish method
 
 
 
@@ -74,11 +96,13 @@ class Employer(User):
         super().__init__(name = name, lastname= lastname,email= email, password= password, Company= company)
         self.phone_number = phone_number
         self.available_offers = []
+        # TODO Create and definite the restant attributes
     def show_lists(self, applicant: Applicant):
         """This method shows a list with the amount of persons that applies to the jobs.
         Args:
         applicant(Applicant): Attributes of the applicant.
         """
+        # TODO Do the method
     
 class Administrator(User):
     """This class is a specialization of the class User"""
@@ -86,6 +110,8 @@ class Administrator(User):
         super.__init__(name= name, lastname= lastname, email= email, password= password)
         self.is_administrator = is_Administrator
         self.available_companies = []
+        # TODO Create and definite the restant attributes
+        
     def generate_statistics(self, applicant: Applicant, employer: Employer, job_offer:job_Offer):
         """This method allows that the administrator generate statistics about the application
         Args:
@@ -93,3 +119,4 @@ class Administrator(User):
         employer(Employer): Attributes of the employer.
         job_offer(Job_offer): Information about the job´s offers availables into the application
         """
+        # TODO Do the method
