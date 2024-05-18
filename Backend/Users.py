@@ -97,12 +97,14 @@ class Employer(User):
         self.phone_number = phone_number
         self.available_offers = []
         # TODO Create and definite the restant attributes
+        
     def show_lists(self, applicant: Applicant):
         """This method shows a list with the amount of persons that applies to the jobs.
         Args:
         applicant(Applicant): Attributes of the applicant.
         """
-        # TODO Do the method
+        print(User_List)
+        # TODO Finish method
     
 class Administrator(User):
     """This class is a specialization of the class User"""
@@ -111,7 +113,7 @@ class Administrator(User):
         self.is_administrator = is_Administrator
         self.available_companies = []
         # TODO Create and definite the restant attributes
-        
+
     def generate_statistics(self, applicant: Applicant, employer: Employer, job_offer:job_Offer):
         """This method allows that the administrator generate statistics about the application
         Args:

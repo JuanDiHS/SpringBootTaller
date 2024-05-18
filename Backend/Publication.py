@@ -53,10 +53,15 @@ class Applicant_Publication(Publication):
         self.schedule = schedule
         self.study_Level = study_Level
     
-    def show_job_publication(self, job_Application: job_Application, applicant: Applicant):
+    def show_job_publication(self, job_Application: job_Application):
         """This method is to show a job application from an applicant
         Args:
         job_application(job_Application): Attributes of the job application of the applicant
         applicant(Applicant): Attribute of the user that create the publication.
         """
-        # TODO Create the method
+        print(job_Application.applicant)
+        print(job_Application.name)
+        print(job_Application.description)
+        
+    
+        # TODO Finish method
