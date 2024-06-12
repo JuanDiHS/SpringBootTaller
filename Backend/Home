@@ -1,0 +1,59 @@
+# Datos de las ofertas de trabajo (simulación) 
+
+ofertas_de_trabajo = [ 
+
+    { 
+
+        "id": 1, 
+
+        "titulo": "Desarrollador Web", 
+
+        "empresa": "XYZ Tech", 
+
+        "ciudad": "Ciudad Ejemplo", 
+
+        "descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ultricies nisi eget elit consequat, eu volutpat tortor congue." 
+
+    }, 
+
+    # Puedes agregar más ofertas de trabajo aquí 
+
+] 
+
+  
+
+# Perfil del aspirante (simulación) 
+
+perfil_aspirante = { 
+
+    "nombre": "Nombre", 
+
+    "apellido": "Apellido", 
+
+    "correo": "ejemplo@correo.com", 
+
+    "carrera": "Ingeniería en Informática", 
+
+    "edad": 25, 
+
+    "ciudad": "Ciudad de Ejemplo", 
+
+    "descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ultricies nisi eget elit consequat, eu volutpat tortor congue.", 
+
+    "ofertas_aplicadas": [] 
+
+} 
+
+  
+
+class OfertaDeTrabajo(BaseModel): 
+
+    id: int 
+
+    titulo: str 
+
+    empresa: str 
+
+    ciudad: str 
+
+    descripcion: str 
