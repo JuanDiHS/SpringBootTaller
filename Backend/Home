@@ -1,13 +1,3 @@
-from fastapi import FastAPI, HTTPException 
-
-from pydantic import BaseModel 
-
-  
-
-app = FastAPI() 
-
-  
-
 # Datos de las ofertas de trabajo (simulación) 
 
 ofertas_de_trabajo = [ 
