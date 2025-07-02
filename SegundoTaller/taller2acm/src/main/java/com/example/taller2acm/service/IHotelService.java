@@ -8,7 +8,6 @@ public interface IHotelService extends BaseService<HotelEntity>{
     List<HotelEntity> findAll();
     Optional<HotelEntity> findById(Long id);
     Optional<HotelEntity> findByNombre(String nombre);
-    List<HotelEntity> findByCiudad(String ciudad);
     HotelEntity save(HotelEntity hotel);
     void deleteById(Long id);
 }

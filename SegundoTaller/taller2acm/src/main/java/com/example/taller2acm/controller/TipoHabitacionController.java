@@ -2,14 +2,11 @@ package com.example.taller2acm.controller;
 
 
 import com.example.taller2acm.dto.TipoHabitacionDTO;
-import com.example.taller2acm.model.TipoHabitacion;
 import com.example.taller2acm.service.ITipoHabitacionService;
 import com.example.taller2acm.util.TipoHabitacionMapper;
 
 import jakarta.validation.Valid;
 
-import com.example.taller2acm.persistence.entity.TipoHabitacionEntity;
-import com.example.taller2acm.persistence.repository.TipoHabitacionJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,18 +23,29 @@ import java.util.stream.Collectors;
 @Validated
 public class TipoHabitacionController {
     private final ITipoHabitacionService service;
-    private final TipoHabitacionMapper mapper;
 
     @PostMapping
     public ResponseEntity<TipoHabitacionDTO> create(@Valid @RequestBody TipoHabitacionDTO dto) {
-        TipoHabitacionEntity saved = service.save(mapper.modelFromDto(dto));
-        return ResponseEntity.ok(mapper.dtoFromModel(saved));
+           // 1) DTO → Model
+        var model = TipoHabitacionMapper.modelFromDto(dto);
+        // 2) Model → Entity
+        var entity = TipoHabitacionMapper.entityFromModel(model);
+        // 3) Guardar Entity
+        var savedEntity = service.save(entity);
+        // 4) Entity → Model
+        var savedModel  = TipoHabitacionMapper.modelFromEntity(savedEntity);
+        // 5) Model → DTO
+        var resultDto   = TipoHabitacionMapper.dtoFromModel(savedModel);
+        return ResponseEntity.ok(resultDto);
     }
 
     @GetMapping
     public ResponseEntity<List<TipoHabitacionDTO>> getAll() {
-        List<TipoHabitacionDTO> list = service.findAll().stream()
-            .map(mapper::modelToDto)
+         List<TipoHabitacionDTO> list = service.findAll().stream()
+            .map(entity -> {
+                var model = TipoHabitacionMapper.modelFromEntity(entity);
+                return TipoHabitacionMapper.dtoFromModel(model);
+            })
             .collect(Collectors.toList());
         return ResponseEntity.ok(list);
     }
@@ -45,7 +53,11 @@ public class TipoHabitacionController {
     @GetMapping("/{id}")
     public ResponseEntity<TipoHabitacionDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-            .map(entity -> ResponseEntity.ok(mapper.dtoFromModel(entity)))
+            .map(entity -> {
+                var model = TipoHabitacionMapper.modelFromEntity(entity);
+                return TipoHabitacionMapper.dtoFromModel(model);
+            })
+            .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 

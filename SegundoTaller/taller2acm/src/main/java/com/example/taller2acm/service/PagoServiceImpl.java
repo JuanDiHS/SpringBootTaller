@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.PagoEntity;
 import com.example.taller2acm.persistence.repository.PagoJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,10 +36,6 @@ public class PagoServiceImpl implements IPagoService {
         return repo.findByReservaId(reservaId);
     }
 
-    @Override
-    public List<PagoEntity> findByMetodoPago(String metodoPago) {
-        return repo.findByMetodoPago(metodoPago);
-    }
 
     @Override
     public PagoEntity save(PagoEntity pago) {
@@ -50,20 +48,39 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     @Override
-    public PagoEntity update(PagoEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Pago con id " + id + " no encontrado");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public PagoEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Pago con id " + id + " no encontrado"));
     }
+
+    @Override
+    public PagoEntity update(PagoEntity entity) {
+        Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Pago con id " + id + " no encontrado");
+        }
+        // Guarda cambios
+        return repo.save(entity);
+    }
+
 }

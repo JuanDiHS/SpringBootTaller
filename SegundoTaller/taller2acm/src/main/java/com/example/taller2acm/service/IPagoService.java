@@ -8,7 +8,6 @@ public interface IPagoService extends BaseService<PagoEntity>{
     List<PagoEntity> findAll();
     Optional<PagoEntity> findById(Long id);
     List<PagoEntity> findByReservaId(Long reservaId);
-    List<PagoEntity> findByMetodoPago(String metodoPago);
     PagoEntity save(PagoEntity pago);
     void deleteById(Long id);
 }

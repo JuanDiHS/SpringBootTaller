@@ -8,8 +8,6 @@ public interface IHabitacionService extends BaseService<HabitacionEntity>{
     List<HabitacionEntity> findAll();
     Optional<HabitacionEntity> findById(Long id);
     Optional<HabitacionEntity> findByNumeroHabitacion(Integer numeroHabitacion);
-    List<HabitacionEntity> findByHotelId(Long hotelId);
-    List<HabitacionEntity> findByTipoHabitacionId(Long tipoHabitacionId);
     HabitacionEntity save(HabitacionEntity habitacion);
     void deleteById(Long id);
 }

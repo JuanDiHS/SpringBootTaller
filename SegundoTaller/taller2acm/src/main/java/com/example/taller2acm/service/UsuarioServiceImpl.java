@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.UsuarioEntity;
 import com.example.taller2acm.persistence.repository.UsuarioJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,30 +31,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return repo.findById(id);
     }
 
-    @Override
-    public Optional<UsuarioEntity> findByNombreUsuario(String nombreUsuario) {
-        return repo.findByNombreUsuario(nombreUsuario);
-    }
-
-    @Override
-    public List<UsuarioEntity> findByRol(String rol) {
-        return repo.findByRol(rol);
-    }
-
-    @Override
-    public Optional<UsuarioEntity> findByClienteId(Long clienteId) {
-        return repo.findByClienteId(clienteId);
-    }
-
-    @Override
-    public Optional<UsuarioEntity> findByEmpleadoId(Long empleadoId) {
-        return repo.findByEmpleadoId(empleadoId);
-    }
-
-    @Override
-    public Optional<UsuarioEntity> findByAdministradorGeneralId(Long adminGeneralId) {
-        return repo.findByAdministradorGeneralId(adminGeneralId);
-    }
 
     @Override
     public UsuarioEntity save(UsuarioEntity usuario) {
@@ -65,20 +43,40 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
-    public UsuarioEntity update(UsuarioEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public UsuarioEntity update(UsuarioEntity entity) {
+      Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Usuario con id " + id + " no encontrado");
+        }
+        // Guarda cambios
+        return repo.save(entity);
     }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Usuario con id " + id + " no encontrado");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public UsuarioEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+       Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario con id " + id + " no encontrado"));
     }
+
+
 }

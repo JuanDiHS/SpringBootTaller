@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
 import com.example.taller2acm.persistence.entity.HabitacionEntity;
 import com.example.taller2acm.persistence.repository.HabitacionJpaRepository;
 
@@ -36,16 +37,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
     }
 
     @Override
-    public List<HabitacionEntity> findByHotelId(Long hotelId) {
-        return repo.findByHotelId(hotelId);
-    }
-
-    @Override
-    public List<HabitacionEntity> findByTipoHabitacionId(Long tipoHabitacionId) {
-        return repo.findByTipoHabitacionId(tipoHabitacionId);
-    }
-
-    @Override
     public HabitacionEntity save(HabitacionEntity habitacion) {
         return repo.save(habitacion);
     }
@@ -55,33 +46,41 @@ public class HabitacionServiceImpl implements IHabitacionService {
         repo.deleteById(id);
     }
 
-    @Override
-    public HabitacionEntity update(HabitacionEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+         Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Habitación con id " + id + " no encontrada");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public HabitacionEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Habitación con id " + id + " no encontrada"));
     }
 
     @Override
-    public HabitacionEntity update(HabitacionEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public HabitacionEntity update(HabitacionEntity entity) {
+      Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Habitación con id " + id + " no encontrada");
+        }
+        // Guarda los cambios
+        return repo.save(entity);
     }
 
-    @Override
-    public HabitacionEntity save(HabitacionEntity habitacion) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
 }

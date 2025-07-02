@@ -1,5 +1,6 @@
 package com.example.taller2acm.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,6 @@ import com.example.taller2acm.persistence.entity.ReservaEntity;
 public interface ReservaJpaRepository extends JpaRepository<ReservaEntity, Long>{
 
     Optional<ReservaEntity> findByEmail(String email);
+    List<ReservaEntity> findByClienteId(Long clienteId);
 
 }

@@ -8,7 +8,6 @@ public interface IFacturaService extends BaseService<FacturaEntity>{
     List<FacturaEntity> findAll();
     Optional<FacturaEntity> findById(Long id);
     List<FacturaEntity> findByReservaId(Long reservaId);
-    List<FacturaEntity> findByPagoId(Long pagoId);
     FacturaEntity save(FacturaEntity factura);
     void deleteById(Long id);
 }

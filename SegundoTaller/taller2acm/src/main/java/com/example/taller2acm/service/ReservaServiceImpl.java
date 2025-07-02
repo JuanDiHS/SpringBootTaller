@@ -1,12 +1,13 @@
 package com.example.taller2acm.service;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.taller2acm.model.Reserva;
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.ReservaEntity;
 import com.example.taller2acm.persistence.repository.ReservaJpaRepository;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,94 +19,67 @@ import lombok.extern.slf4j.Slf4j;
 public class ReservaServiceImpl implements IReservaService {
 
     private final ReservaJpaRepository repository;
-    private final ReservaMapper mapper;
 
     @Override
-    public Reserva save(Reserva Model) {
-        ReservaEntity entity = mapper.modelToEntity(Model);
-        return mapper.entityToModel(repository.save(entity));
-    }
-
-    @Override
-    public Reserva update(Reserva Model) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public Reserva findById(String id) {
-
-        return repository.findAll().stream().map(mapper::entityToModel).toList();
-        
-    }
-
-    @Override
-    public List<Reserva> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
-    }
-
-    @Override
-    public Optional<Reserva> findByEmail(String email) {
-
-        return repository.findByEmail(email).map(mapper::entityToModel)
-        .or(Optional::empty; 
-
-        );
-    }
-
-    @Override
-    public ReservaEntity save(ReservaEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
-    @Override
-    public ReservaEntity update(ReservaEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public List<ReservaEntity> findAll() {
+        return repository.findAll();
     }
 
     @Override
     public Optional<ReservaEntity> findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
-    }
-
-    @Override
-    public List<ReservaEntity> findByClienteId(Long clienteId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByClienteId'");
-    }
-
-    @Override
-    public List<ReservaEntity> findByHabitacionId(Long habitacionId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByHabitacionId'");
-    }
-
-    @Override
-    public List<ReservaEntity> findByFechaInicioBetween(LocalDateTime start, LocalDateTime end) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByFechaInicioBetween'");
+        return repository.findById(id);
     }
 
     @Override
     public ReservaEntity save(ReservaEntity reserva) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        return repository.save(reserva);
     }
 
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        repository.deleteById(id);
     }
+
+    @Override
+    public ReservaEntity update(ReservaEntity reserva) {
+        Long id = reserva.getId();
+        if (id == null || !repository.existsById(id)) {
+            throw new ResourceNotFoundException("Reserva con id " + id + " no encontrada");
+        }
+        return repository.save(reserva);
+    }
+
+    @Override
+    public List<ReservaEntity> findByClienteId(Long clienteId) {
+        return repository.findByClienteId(clienteId);
+    }
+
+    @Override
+    public void delete(String id) {
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repository.existsById(idLong)) {
+            throw new ResourceNotFoundException("Reserva con id " + id + " no encontrada");
+        }
+        repository.deleteById(idLong);
+    }
+
+    @Override
+    public ReservaEntity findById(String id) {
+       Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repository.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Reserva con id " + id + " no encontrada"));
+    }
+
+
 
 }

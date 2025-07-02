@@ -2,13 +2,11 @@ package com.example.taller2acm.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.taller2acm.model.Reserva;
 import com.example.taller2acm.persistence.entity.AdminGeneralEntity;
-import com.example.taller2acm.persistence.entity.ReservaEntity;
 import com.example.taller2acm.persistence.repository.AdminGeneralJpaRepository;
-import com.example.taller2acm.util.AdminGeneralMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,95 +18,76 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminGeneralServiceImpl implements IAdminGeneralService {
 
     private final AdminGeneralJpaRepository repository;
-    private final AdminGeneralMapper mapper;
-
-    @Override
-    public Reserva save(Reserva Model) {
-        ReservaEntity entity = mapper.entityFromModel(Model);
-        return mapper.entityToModel(repository.save(entity));
-    }
-
-    @Override
-    public Reserva update(Reserva Model) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-
-    @Override
-    public Reserva findById(String id) {
-
-        return repository.findAll().stream().map(mapper::entityToModel).toList();
-        
-    }
-
-    @Override
-    public List<Reserva> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
-    }
-
-    @Override
-    public Optional<Reserva> findByEmail(String email) {
-
-        return repository.findByEmail(email).map(mapper::entityToModel)
-        .or(Optional::empty; 
-
-        );
-    }
-
-    @Override
-    public AdminGeneralEntity save(AdminGeneralEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
-    @Override
-    public AdminGeneralEntity update(AdminGeneralEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public Optional<AdminGeneralEntity> findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
-    }
-
-    @Override
-    public Optional<AdminGeneralEntity> findByCorreo(String correo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByCorreo'");
-    }
 
     @Override
     public AdminGeneralEntity save(AdminGeneralEntity admin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        return repository.save(admin);
     }
+
+
+
+     @Override
+    public List<AdminGeneralEntity> findAll() {
+        return repository.findAll();
+    }
+
+
+     @Override
+    public Optional<AdminGeneralEntity> findById(Long id) {
+        return repository.findById(id);
+    }
+
+   @Override
+    public Optional<AdminGeneralEntity> findByCorreo(String correo) {
+        return repository.findByCorreo(correo);
+    }
+
 
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        repository.deleteById(id);
     }
 
     @Override
-    public AdminGeneralEntity update(AdminGeneralEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public AdminGeneralEntity update(AdminGeneralEntity entity) {
+        if (entity.getId() == null || !repository.existsById(entity.getId())) {
+            throw new ResourceNotFoundException(
+                "AdministradorGeneral con id " + entity.getId() + " no encontrado"
+            );
+        }
+        // Reutiliza save para el update
+        return repository.save(entity);
+    }
+
+
+    @Override
+    public void delete(String id) {
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repository.existsById(idLong)) {
+            throw new ResourceNotFoundException("AdministradorGeneral con id " + id + " no encontrado");
+        }
+        repository.deleteById(idLong);
     }
 
     @Override
-    public AdminGeneralEntity save(AdminGeneralEntity admin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    public AdminGeneralEntity findById(String id) {
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repository.findById(idLong)
+           .orElseThrow(() -> new ResourceNotFoundException(
+                "AdministradorGeneral con id " + id + " no encontrado"
+            ));
+    }
     }
 
-}
+   
 

@@ -1,13 +1,11 @@
 package com.example.taller2acm.controller;
 
 import com.example.taller2acm.dto.HabitacionDTO;
-import com.example.taller2acm.model.Habitacion;
 import com.example.taller2acm.service.IHabitacionService;
 import com.example.taller2acm.util.HabitacionMapper;
 
 import jakarta.validation.Valid;
 
-import com.example.taller2acm.persistence.repository.HabitacionJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,18 +22,29 @@ import java.util.stream.Collectors;
 @Validated
 public class HabitacionController {
     private final IHabitacionService service;
-    private final HabitacionMapper mapper;
 
     @PostMapping
     public ResponseEntity<HabitacionDTO> create(@Valid @RequestBody HabitacionDTO dto) {
-        HabitacionEntity saved = service.save(mapper.modelFromDto(dto));
-        return ResponseEntity.ok(mapper.modelToDto(saved));
+         // 1) DTO → Model
+        var model = HabitacionMapper.modelFromDto(dto);
+        // 2) Model → Entity
+        var entity = HabitacionMapper.entityFromModel(model);
+        // 3) Guardar Entity
+        var savedEntity = service.save(entity);
+        // 4) Entity → Model
+        var savedModel  = HabitacionMapper.modelFromEntity(savedEntity);
+        // 5) Model → DTO
+        var resultDto   = HabitacionMapper.dtoFromModel(savedModel);
+        return ResponseEntity.ok(resultDto);
     }
 
     @GetMapping
     public ResponseEntity<List<HabitacionDTO>> getAll() {
         List<HabitacionDTO> list = service.findAll().stream()
-            .map(mapper::modelToDto)
+            .map(entity -> {
+                var model = HabitacionMapper.modelFromEntity(entity);
+                return HabitacionMapper.dtoFromModel(model);
+            })
             .collect(Collectors.toList());
         return ResponseEntity.ok(list);
     }
@@ -43,16 +52,22 @@ public class HabitacionController {
     @GetMapping("/{id}")
     public ResponseEntity<HabitacionDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-            .map(entity -> ResponseEntity.ok(mapper.dtoFromModel(entity)))
+            .map(entity -> {
+                var model = HabitacionMapper.modelFromEntity(entity);
+                return HabitacionMapper.dtoFromModel(model);
+            })
+            .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<HabitacionDTO> update(@PathVariable Long id, @Valid @RequestBody HabitacionDTO dto) {
-        HabitacionEntity toUpdate = mapper.modelFromDto(dto);
-        toUpdate.setId(id);
-        HabitacionEntity updated = service.save(toUpdate);
-        return ResponseEntity.ok(mapper.dtoFromModel(updated));
+         var model    = HabitacionMapper.modelFromDto(dto);
+        var entity   = HabitacionMapper.entityFromModel(model);
+        entity.setId(id);
+        var updatedE = service.save(entity);
+        var updatedM = HabitacionMapper.modelFromEntity(updatedE);
+        return ResponseEntity.ok(HabitacionMapper.dtoFromModel(updatedM));
     }
 
     @DeleteMapping("/{id}")

@@ -2,8 +2,11 @@ package com.example.taller2acm.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.FacturaEntity;
 import com.example.taller2acm.persistence.repository.FacturaJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,10 +36,6 @@ public class FacturaServiceImpl implements IFacturaService {
         return repo.findByReservaId(reservaId);
     }
 
-    @Override
-    public List<FacturaEntity> findByPagoId(Long pagoId) {
-        return repo.findByPagoId(pagoId);
-    }
 
     @Override
     public FacturaEntity save(FacturaEntity factura) {
@@ -48,21 +47,42 @@ public class FacturaServiceImpl implements IFacturaService {
         repo.deleteById(id);
     }
 
-    @Override
-    public FacturaEntity update(FacturaEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+       Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Factura con id " + id + " no encontrada");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public FacturaEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Factura con id " + id + " no encontrada"));
     }
+
+    @Override
+    public FacturaEntity update(FacturaEntity entity) {
+         Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Factura con id " + id + " no encontrada");
+        }
+        // Guardar cambios
+        return repo.save(entity);
+    }
+
+
 }

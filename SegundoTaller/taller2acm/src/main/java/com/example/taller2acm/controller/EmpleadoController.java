@@ -3,13 +3,11 @@ package com.example.taller2acm.controller;
 
 
 import com.example.taller2acm.dto.EmpleadoDTO;
-import com.example.taller2acm.model.Empleado;
 import com.example.taller2acm.service.IEmpleadoService;
 import com.example.taller2acm.util.EmpleadoMapper;
 
 import jakarta.validation.Valid;
 
-import com.example.taller2acm.persistence.repository.EmpleadoJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,18 +22,29 @@ import java.util.stream.Collectors;
 @Validated
 public class EmpleadoController {
     private final IEmpleadoService service;
-    private final EmpleadoMapper mapper;
 
     @PostMapping
     public ResponseEntity<EmpleadoDTO> create(@Valid @RequestBody EmpleadoDTO dto) {
-        EmpleadoEntity saved = service.save(mapper.modelFromDto(dto));
-        return ResponseEntity.ok(mapper.modelToDto(saved));
+        // 1) DTO → Model
+        var model = EmpleadoMapper.modelFromDto(dto);
+        // 2) Model → Entity
+        var entity = EmpleadoMapper.entityFromModel(model);
+        // 3) Guardar Entity
+        var savedEntity = service.save(entity);
+        // 4) Entity → Model
+        var savedModel  = EmpleadoMapper.modelFromEntity(savedEntity);
+        // 5) Model → DTO
+        var resultDto   = EmpleadoMapper.dtoFromModel(savedModel);
+        return ResponseEntity.ok(resultDto);
     }
 
     @GetMapping
     public ResponseEntity<List<EmpleadoDTO>> getAll() {
-        List<EmpleadoDTO> list = service.findAll().stream()
-            .map(mapper::modelToDto)
+       List<EmpleadoDTO> list = service.findAll().stream()
+            .map(entity -> {
+                var model = EmpleadoMapper.modelFromEntity(entity);
+                return EmpleadoMapper.dtoFromModel(model);
+            })
             .collect(Collectors.toList());
         return ResponseEntity.ok(list);
     }
@@ -43,16 +52,22 @@ public class EmpleadoController {
     @GetMapping("/{id}")
     public ResponseEntity<EmpleadoDTO> getById(@PathVariable Long id) {
         return service.findById(id)
-            .map(entity -> ResponseEntity.ok(mapper.dtoFromModel(entity)))
+            .map(entity -> {
+                var model = EmpleadoMapper.modelFromEntity(entity);
+                return EmpleadoMapper.dtoFromModel(model);
+            })
+            .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EmpleadoDTO> update(@PathVariable Long id, @Valid @RequestBody EmpleadoDTO dto) {
-        EmpleadoEntity toUpdate = mapper.modelFromDto(dto);
-        toUpdate.setId(id);
-        EmpleadoEntity updated = service.save(toUpdate);
-        return ResponseEntity.ok(mapper.dtoFromModel(updated));
+        var model    = EmpleadoMapper.modelFromDto(dto);
+        var entity   = EmpleadoMapper.entityFromModel(model);
+        entity.setId(id);
+        var updatedE = service.save(entity);
+        var updatedM = EmpleadoMapper.modelFromEntity(updatedE);
+        return ResponseEntity.ok(EmpleadoMapper.dtoFromModel(updatedM));
     }
 
     @DeleteMapping("/{id}")

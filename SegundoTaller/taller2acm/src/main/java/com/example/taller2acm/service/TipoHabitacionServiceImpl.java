@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.TipoHabitacionEntity;
 import com.example.taller2acm.persistence.repository.TipoHabitacionJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,10 +36,6 @@ public class TipoHabitacionServiceImpl implements ITipoHabitacionService {
         return repo.findByNombre(nombre);
     }
 
-    @Override
-    public List<TipoHabitacionEntity> findByHotelId(Long hotelId) {
-        return repo.findByHotelId(hotelId);
-    }
 
     @Override
     public TipoHabitacionEntity save(TipoHabitacionEntity tipo) {
@@ -50,20 +48,41 @@ public class TipoHabitacionServiceImpl implements ITipoHabitacionService {
     }
 
     @Override
-    public TipoHabitacionEntity update(TipoHabitacionEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public TipoHabitacionEntity update(TipoHabitacionEntity entity) {
+         Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("TipoHabitacion con id " + id + " no encontrado");
+        }
+        // Guarda los cambios
+        return repo.save(entity);
     }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+         Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("TipoHabitacion con id " + id + " no encontrado");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public TipoHabitacionEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("TipoHabitacion con id " + id + " no encontrado"));
     }
-}
+    }
+
+   
+

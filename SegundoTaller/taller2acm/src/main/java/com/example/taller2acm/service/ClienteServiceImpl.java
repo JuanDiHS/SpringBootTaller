@@ -5,6 +5,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
+import com.example.taller2acm.persistence.entity.ClienteEntity;
+import com.example.taller2acm.persistence.repository.ClienteJpaRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,16 +32,6 @@ public class ClienteServiceImpl implements IClienteService {
     }
 
     @Override
-    public Optional<ClienteEntity> findByCedula(Integer cedula) {
-        return repo.findByCedula(cedula);
-    }
-
-    @Override
-    public List<ClienteEntity> findByPrimerApellido(String primerApellido) {
-        return repo.findByPrimerApellido(primerApellido);
-    }
-
-    @Override
     public ClienteEntity save(ClienteEntity cliente) {
         return repo.save(cliente);
     }
@@ -48,20 +42,40 @@ public class ClienteServiceImpl implements IClienteService {
     }
 
     @Override
-    public ClienteEntity update(ClienteEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public ClienteEntity update(ClienteEntity entity) {
+          Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Cliente con id " + id + " no encontrado");
+        }
+        // Reutiliza save para aplicar cambios
+        return repo.save(entity);
     }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+       Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Cliente con id " + id + " no encontrado");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public ClienteEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Cliente con id " + id + " no encontrado"));
     }
-}
+    }
+
+

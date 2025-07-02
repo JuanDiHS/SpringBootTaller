@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.taller2acm.exception.ResourceNotFoundException;
 import com.example.taller2acm.persistence.entity.EmpleadoEntity;
 import com.example.taller2acm.persistence.repository.EmpleadoJpaRepository;
 
@@ -29,17 +30,6 @@ public class EmpleadoServiceImpl implements IEmpleadoService {
     public Optional<EmpleadoEntity> findById(Long id) {
         return repo.findById(id);
     }
-
-    @Override
-    public Optional<EmpleadoEntity> findByCorreo(String correo) {
-        return repo.findByCorreo(correo);
-    }
-
-    @Override
-    public Optional<EmpleadoEntity> findByTelefono(String telefono) {
-        return repo.findByTelefono(telefono);
-    }
-
     @Override
     public EmpleadoEntity save(EmpleadoEntity empleado) {
         return repo.save(empleado);
@@ -50,33 +40,40 @@ public class EmpleadoServiceImpl implements IEmpleadoService {
         repo.deleteById(id);
     }
 
+
     @Override
-    public EmpleadoEntity update(EmpleadoEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public EmpleadoEntity update(EmpleadoEntity entity) {
+        Long id = entity.getId();
+        if (id == null || !repo.existsById(id)) {
+            throw new ResourceNotFoundException("Empleado con id " + id + " no encontrado");
+        }
+        // Reutiliza save para el update
+        return repo.save(entity);
     }
 
     @Override
     public void delete(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        if (!repo.existsById(idLong)) {
+            throw new ResourceNotFoundException("Empleado con id " + id + " no encontrado");
+        }
+        repo.deleteById(idLong);
     }
 
     @Override
     public EmpleadoEntity findById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
-    }
-
-    @Override
-    public EmpleadoEntity update(EmpleadoEntity Entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public EmpleadoEntity save(EmpleadoEntity empleado) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+         Long idLong;
+        try {
+            idLong = Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("El id debe ser numérico: " + id);
+        }
+        return repo.findById(idLong)
+            .orElseThrow(() -> new ResourceNotFoundException("Empleado con id " + id + " no encontrado"));
     }
 }
