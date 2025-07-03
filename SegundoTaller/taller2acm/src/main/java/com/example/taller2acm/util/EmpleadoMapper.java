@@ -9,7 +9,7 @@ public class EmpleadoMapper {
         if (e == null) return null;
         return Empleado.builder()
                 .id(e.getId())
-                .correo(e.getCorreo())
+                .correo(e.getEmail())
                 .telefono(e.getTelefono())
                 .primerNombre(e.getPrimerNombre())
                 .segundoNombre(e.getSegundoNombre())
@@ -22,7 +22,7 @@ public class EmpleadoMapper {
         if (m == null) return null;
         EmpleadoEntity e = new EmpleadoEntity();
         e.setId(m.getId());
-        e.setCorreo(m.getCorreo());
+        e.setEmail(m.getCorreo());
         e.setTelefono(m.getTelefono());
         e.setPrimerNombre(m.getPrimerNombre());
         e.setSegundoNombre(m.getSegundoNombre());

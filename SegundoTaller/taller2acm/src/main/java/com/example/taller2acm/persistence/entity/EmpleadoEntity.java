@@ -25,7 +25,7 @@ public class EmpleadoEntity {
     @Column(name = "id_empleado")
     private Long id;
 
-    private String correo;
+    private String email;
     private String telefono;
     private String primerNombre;
     private String segundoNombre;
